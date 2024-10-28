@@ -16,3 +16,6 @@ http PUT http://localhost:3000/api/movies/4 title="Updated Movie Title" summary=
 ![image](https://github.com/user-attachments/assets/573f983c-cedf-4076-9660-9daa5c7f0520)
 
 ## Delete a movie entry
+http DELETE http://localhost:3000/api/movies/4
+![image](https://github.com/user-attachments/assets/8b5c2843-e62a-4ec4-9af6-55a5acef89e0)
+![image](https://github.com/user-attachments/assets/5bfcbadf-d78a-462b-998f-0c64b2026393)
