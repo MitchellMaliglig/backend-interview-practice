@@ -38,7 +38,7 @@ app.post('/api/movies', async (req, res) =>{
     try{
         const {title, summary, link, rating} = req.body;
         if (!title || !summary || !link || !rating){
-            console.error('Title, summary, link, & rating required');
+            console.error('title, summary, link, & rating required');
         }
         const sql = `
             INSERT INTO "movies" ("title", "summary", "link", "rating")
@@ -53,6 +53,57 @@ app.post('/api/movies', async (req, res) =>{
         console.error(err);
     }
 });
+
+app.put('/api/movies/:movieId', async (req, res) =>{
+    try{
+        const {movieId} = req.params;
+        const {title, summary, link, rating} = req.body;
+        if (!movieId || !title || !summary || !link || !rating){
+            console.error('movieId, title, summary, link, & rating required');
+        }
+        const sql = `
+            UPDATE "movies" 
+            SET "title" = $2 , "summary" = $3, "link" = $4, "rating" = $5
+            WHERE "movieid" = $1
+            RETURNING *;
+        `;
+        const params = [movieId, title, summary, link, rating];
+        const result = await pool.query(sql, params);
+        const [movie] = result.rows;
+        if (movie) {
+            res.status(200).json(movie);
+        } else {
+            res.status(404).json({error: `404: movie ${movieId} not found`});
+        }
+    } catch (err){
+        console.error(err);
+    }
+}); 
+
+
+app.delete('/api/movies/:movieId', async (req, res) => {
+    try {
+      const { movieId } = req.params;
+      if (!movieId){
+        console.error('movieId required');
+      }
+      const sql = `
+        DELETE FROM "movies"
+        WHERE "movieid" = $1
+        RETURNING *;
+      `;
+      const params = [movieId];
+      const result = await pool.query(sql, params);
+      const movie = result.rows[0];
+      if (movie) {
+        res.sendStatus(204);
+      } else {
+        res.status(404).json({error: `404: movie ${movieId} not found`});
+      }
+    } catch (err) {
+        console.error(err);
+    }
+  });
 
 // Test endpoint to check database connection
 app.get('/test-db', async (req, res) => {
