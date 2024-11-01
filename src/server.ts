@@ -1,8 +1,6 @@
+import 'dotenv/config';
 import express from 'express';
 import { Pool } from 'pg';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -21,6 +19,7 @@ app.use((req, res, next) => {
     next();
 });
 
+// get all movies
 app.get('/api/movies', async (req, res) =>{
     try{
         const sql = `
@@ -31,14 +30,17 @@ app.get('/api/movies', async (req, res) =>{
         res.status(200).json(movies);
     } catch (err){
         console.error(err);
+        res.status(500).json({ error: 'Error fetching movies' });
     }
 });
 
+// insert a movie
 app.post('/api/movies', async (req, res) =>{
     try{
         const {title, summary, link, rating} = req.body;
         if (!title || !summary || !link || !rating){
             console.error('title, summary, link, & rating required');
+            res.status(400).json({ error: 'title, summary, link, & rating required' });
         }
         const sql = `
             INSERT INTO "movies" ("title", "summary", "link", "rating")
@@ -51,20 +53,27 @@ app.post('/api/movies', async (req, res) =>{
         res.status(201).json(movie);
     } catch (err){
         console.error(err);
+        res.status(500).json({ error: 'Error inserting movie' });
     }
 });
 
+// update a movie
 app.put('/api/movies/:movieId', async (req, res) =>{
     try{
         const {movieId} = req.params;
         const {title, summary, link, rating} = req.body;
         if (!movieId || !title || !summary || !link || !rating){
-            console.error('movieId, title, summary, link, & rating required');
+            console.error('movieId, title, summary, link, & rating are required');
+            res.status(400).json({ error: 'movieId, title, summary, link, & rating are required' });
+        }
+        if (!validateMovieId(movieId)){
+            console.error('movieId is not an int');
+            res.status(400).json({ error: 'movieId is not an int' });
         }
         const sql = `
             UPDATE "movies" 
             SET "title" = $2 , "summary" = $3, "link" = $4, "rating" = $5
-            WHERE "movieid" = $1
+            WHERE "movieId" = $1
             RETURNING *;
         `;
         const params = [movieId, title, summary, link, rating];
@@ -73,23 +82,29 @@ app.put('/api/movies/:movieId', async (req, res) =>{
         if (movie) {
             res.status(200).json(movie);
         } else {
-            res.status(404).json({error: `404: movie ${movieId} not found`});
+            res.status(404).json({error: `movie ${movieId} not found`});
         }
     } catch (err){
         console.error(err);
+        res.status(500).json({ error: 'Error updating movies' });
     }
 }); 
 
-
+// delete a movie
 app.delete('/api/movies/:movieId', async (req, res) => {
     try {
       const { movieId } = req.params;
       if (!movieId){
-        console.error('movieId required');
+        console.error('movieId is required');
+        res.status(400).json({ error: 'movieId is required' });
+      }
+      if (!validateMovieId(movieId)){
+        console.error('movieId is not an int');
+        res.status(400).json({ error: 'movieId is not an int' });
       }
       const sql = `
         DELETE FROM "movies"
-        WHERE "movieid" = $1
+        WHERE "movieId" = $1
         RETURNING *;
       `;
       const params = [movieId];
@@ -98,48 +113,19 @@ app.delete('/api/movies/:movieId', async (req, res) => {
       if (movie) {
         res.sendStatus(204);
       } else {
-        res.status(404).json({error: `404: movie ${movieId} not found`});
+        res.status(404).json({error: `movie ${movieId} not found`});
       }
     } catch (err) {
         console.error(err);
+        res.status(500).json({ error: 'Error deleting movies' });
     }
   });
-
-// Test endpoint to check database connection
-app.get('/test-db', async (req, res) => {
-    try {
-        const result = await pool.query('SELECT NOW()');
-        console.log('Database connected successfully:', result.rows[0]);
-        res.json({ message: 'Database is connected', time: result.rows[0].now });
-    } catch (error) {
-        console.error('Error connecting to the database:', error);
-        res.status(500).json({ error: 'Database connection error' });
-    }
-});
-
-// Endpoint to get all users
-app.get('/users', async (req, res) => {
-    try {
-        const result = await pool.query('SELECT * FROM users');
-        res.json(result.rows);
-    } catch (error) {
-        console.error('Error fetching users:', error);
-        res.status(500).json({ error: 'Error fetching users' });
-    }
-});
-
-// Endpoint to get all posts
-app.get('/posts', async (req, res) => {
-    try {
-        const result = await pool.query('SELECT * FROM posts');
-        res.json(result.rows);
-    } catch (error) {
-        console.error('Error fetching posts:', error);
-        res.status(500).json({ error: 'Error fetching posts' });
-    }
-});
 
 // Start the server
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });
+
+function validateMovieId(movieId: string): boolean{
+    return Number.isInteger(movieId);
+}
