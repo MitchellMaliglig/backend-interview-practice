@@ -127,5 +127,6 @@ app.listen(port, () => {
 });
 
 function validateMovieId(movieId: string): boolean{
-    return Number.isInteger(movieId);
+    const id = parseInt(movieId, 10);
+    return Number.isInteger(id);
 }
