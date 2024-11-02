@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
+import cors from 'cors';
 import { Pool } from 'pg';
 
 const app = express();
@@ -7,6 +8,12 @@ const port = process.env.PORT || 3000;
 
 // Middleware
 app.use(express.json());
+
+// CORS
+app.use(cors({
+    origin: 'http://localhost:5173',
+    methods: ['GET', 'POST', 'PUT', 'DELETE']
+}));
 
 // PostgreSQL client setup
 const pool = new Pool({
