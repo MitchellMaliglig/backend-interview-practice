@@ -1,6 +1,9 @@
-import { useEffect, useState } from 'react'
+import { FormEvent, useEffect, useState } from 'react'
 import './App.css'
-import { Movie, getMovies } from './lib/data'
+import { Movie, getMovies, saveMovie } from './lib/data'
+import { MovieCard } from './components/MovieCard';
+import './movie.css'
+import { MovieForm } from './components/MovieForm';
 
 function App() {
   const [movies, setMovies] = useState<Movie[]>([])
@@ -17,15 +20,32 @@ function App() {
     fetchMovies();
   }, []);
 
+  function handleSaveMovie(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const data = new FormData(e.currentTarget);
+    const movie: Movie = {
+      title: data.get('title') as string,
+      summary: data.get('summary') as string,
+      link: data.get('link') as string,
+      rating: Number(data.get('rating') as string),
+    }; 
+    if (movie.title && movie.link && movie.summary){
+      console.log('movie added');
+      saveMovie(movie);
+      const newMovies = [...movies, movie];
+      setMovies(newMovies);
+      e.currentTarget.reset();  
+    } else{
+      console.log('movie not added');
+    }
+  }
+
   return (
     <>
-      {movies.map((m) => (
-        <div key={m.movieId}>
-          <h2>{m.title}</h2>
-          <p>{m.summary}</p>
-          <a href={m.link}>{m.link}</a>
-          <p>Rating: {m.rating}</p>
-        </div>
+      <h1>Movies</h1>
+      <MovieForm onSaveMovie={handleSaveMovie}/>
+      {movies.map((m, i) => (
+        <MovieCard movie={m} key={i}/>
       ))}
     </>
   )
