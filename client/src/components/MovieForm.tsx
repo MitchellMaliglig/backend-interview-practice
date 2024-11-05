@@ -20,7 +20,14 @@ export function MovieForm({ onSaveMovie }: movieFormProps) {
           link<input name="link" placeholder="insert link"></input>
         </label>
         <label>
-          rating<input name="rating" type="number" defaultValue={1} min={1} max={5}></input>
+          rating
+          <input
+            name="rating"
+            type="number"
+            defaultValue={1}
+            min={1}
+            max={5}
+          ></input>
         </label>
       </div>
       <button>Add movie</button>

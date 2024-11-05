@@ -75,11 +75,9 @@ app.put("/api/movies/:movieId", async (req, res) => {
     const { title, summary, link, rating } = req.body;
     if (!movieId || !title || !summary || !link || !rating) {
       console.error("movieId, title, summary, link, & rating are required");
-      res
-        .status(400)
-        .json({
-          error: "movieId, title, summary, link, & rating are required",
-        });
+      res.status(400).json({
+        error: "movieId, title, summary, link, & rating are required",
+      });
     }
     if (!validateMovieId(movieId)) {
       console.error("movieId is not an int");

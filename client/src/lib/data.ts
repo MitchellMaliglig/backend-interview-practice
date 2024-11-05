@@ -9,12 +9,9 @@ export type Movie = {
 export async function getMovies(): Promise<Movie[] | null> {
   const url = "http://localhost:3000/api/movies";
   try {
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`Response status: ${response.status}`);
-    }
-    const json: Movie[] = await response.json();
-    return json;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`Response status: ${res.status}`);
+    return (await res.json()) as Movie[];
   } catch (err) {
     console.error(err);
     return null;
@@ -23,21 +20,51 @@ export async function getMovies(): Promise<Movie[] | null> {
 
 export async function saveMovie(movie: Movie): Promise<Movie | null> {
   const url = "http://localhost:3000/api/movies";
-  try{
-    const response = await fetch(url, {
-      method: 'POST',
+  try {
+    const req = {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(movie),
-    });
-    if (!response.ok) {
-      throw new Error(`Response status: ${response.status}`);
     }
-    const json: Movie = await response.json();
-    return json;
-  } catch (err){
+    const res = await fetch(url, req);
+    if (!res.ok) throw new Error(`Response status: ${res.status}`);
+    return (await res.json()) as Movie;
+  } catch (err) {
     console.error(err);
     return null;
+  }
+}
+
+export async function updateMovie(movie: Movie): Promise<Movie | null> {
+  const url = `http://localhost:3000/api/movies/${movie.movieId}`;
+  try {
+    const req = {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(movie),
+    };
+    const res = await fetch(url, req);
+    if (!res.ok) throw new Error(`Response status: ${res.status}`);
+    return (await res.json()) as Movie;
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+}
+
+export async function deleteMovie(movieId: number): Promise<void> {
+  const url = `http://localhost:3000/api/movies/${movieId}`;
+  try{
+    const req = {
+      method: "DELETE",
+    };
+    const res = await fetch(url, req);
+    if (!res.ok) throw new Error(`Response status: ${res.status}`);
+  } catch(err){
+    console.error(err);
   }
 }
