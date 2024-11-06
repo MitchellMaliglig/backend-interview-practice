@@ -5,7 +5,6 @@ type movieFormProps = {
   onAddMovie?: (e: FormEvent<HTMLFormElement>) => void;
   onSaveMovie?: (e: FormEvent<HTMLFormElement>, newMovieId: number) => void;
   onCancel?: () => void;
-  //movieId?: number;
   movie?: Movie;
 };
 
@@ -13,13 +12,13 @@ export function MovieForm({
   onAddMovie,
   onSaveMovie,
   onCancel,
-  //movieId,
   movie,
 }: movieFormProps) {
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (movie && onSaveMovie) {
+    if (movie && onSaveMovie && onCancel) {
       onSaveMovie(e, movie.movieId!);
+      onCancel();
     } else if (onAddMovie) {
       onAddMovie(e);
     }

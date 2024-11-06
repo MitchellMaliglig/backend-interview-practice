@@ -15,13 +15,22 @@ export function MovieCard({
   onDeleteMovie,
 }: movieCardProps) {
   const [isOpen, setOpen] = useState(false);
+  const [isOpenDelete, setOpenDelete] = useState(false);
 
   function handleOpen() {
     setOpen(true);
   }
 
+  function handleOpenDelete(){
+    setOpenDelete(true);
+  }
+
   function handleCancel() {
     setOpen(false);
+  }
+
+  function handleCancelDelete(){
+    setOpenDelete(false);
   }
 
   return (
@@ -33,12 +42,19 @@ export function MovieCard({
         <p>Rating: {movie.rating}</p>
         <div className="movie-buttons">
           <button onClick={handleOpen}>Edit movie</button>
-          <button onClick={() => {onDeleteMovie(movie.movieId!)}}>Delete movie</button>
+          <button onClick={handleOpenDelete}>Delete movie</button>
         </div>
       </div>
       <Modal isOpen={isOpen} onClose={handleCancel}>
         <p>Do you wish to edit the movie "{movie.title}"?</p>
         <MovieForm onSaveMovie={onSaveMovie} onCancel={handleCancel} movie={movie}/>
+      </Modal>
+      <Modal isOpen={isOpenDelete} onClose={handleCancel}>
+        <p>Do you wish to delete the movie "{movie.title}"</p>
+        <div className="movie-buttons">
+          <button onClick={handleCancelDelete}>Close</button>
+          <button onClick={() => {onDeleteMovie(movie.movieId!)}}>Delete movie</button>
+        </div>
       </Modal>
     </>
   );
