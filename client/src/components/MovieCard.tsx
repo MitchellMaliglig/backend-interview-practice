@@ -38,7 +38,7 @@ export function MovieCard({
       </div>
       <Modal isOpen={isOpen} onClose={handleCancel}>
         <p>Do you wish to edit the movie "{movie.title}"?</p>
-        <MovieForm onSaveMovie={onSaveMovie} onCancel={handleCancel} movieId={movie.movieId}/>
+        <MovieForm onSaveMovie={onSaveMovie} onCancel={handleCancel} movie={movie}/>
       </Modal>
     </>
   );
