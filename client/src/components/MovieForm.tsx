@@ -1,12 +1,29 @@
 import { FormEvent } from "react";
 
 type movieFormProps = {
-  onSaveMovie: (e: FormEvent<HTMLFormElement>) => void;
+  onAddMovie?: (e: FormEvent<HTMLFormElement>) => void;
+  onSaveMovie?: (e: FormEvent<HTMLFormElement>, newMovieId: number) => void;
+  onCancel?: () => void;
+  movieId?: number;
 };
 
-export function MovieForm({ onSaveMovie }: movieFormProps) {
+export function MovieForm({
+  onAddMovie,
+  onSaveMovie,
+  onCancel,
+  movieId,
+}: movieFormProps) {
+  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (movieId !== undefined && onSaveMovie) {
+      onSaveMovie(e, movieId);
+    } else if (onAddMovie) {
+      onAddMovie(e);
+    }
+  }
+
   return (
-    <form onSubmit={onSaveMovie}>
+    <form onSubmit={handleSubmit}>
       <div className="row">
         <label>
           title<input name="title" placeholder="insert title"></input>
@@ -30,7 +47,15 @@ export function MovieForm({ onSaveMovie }: movieFormProps) {
           ></input>
         </label>
       </div>
-      <button>Add movie</button>
+      {onAddMovie && <button>Add movie</button>}
+      {onSaveMovie && (
+        <div className="movie-buttons">
+          <button type="button" onClick={onCancel}>
+            Close
+          </button>
+          <button type="submit">Save</button>
+        </div>
+      )}
     </form>
   );
 }

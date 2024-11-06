@@ -1,6 +1,6 @@
 import { FormEvent, useEffect, useState } from "react";
 import "./App.css";
-import { Movie, deleteMovie, getMovies, saveMovie } from "./lib/data";
+import { Movie, deleteMovie, getMovies, saveMovie, updateMovie } from "./lib/data";
 import { MovieCard } from "./components/MovieCard";
 import "./movie.css";
 import { MovieForm } from "./components/MovieForm";
@@ -20,7 +20,7 @@ function App() {
     fetchMovies();
   }, []);
 
-  async function handleSaveMovie(e: FormEvent<HTMLFormElement>) {
+  async function handleAddMovie(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
     const data = new FormData(form);
@@ -31,9 +31,9 @@ function App() {
       rating: Number(data.get("rating") as string),
     };
     if (movie.title && movie.link && movie.summary) {
-      console.log("movie added");
       const savedMovie = await saveMovie(movie);
       if (savedMovie){
+        console.log("movie added");
         const newMovies = [...movies, savedMovie];
         setMovies(newMovies);
       }
@@ -43,8 +43,30 @@ function App() {
     }
   }
 
-  function handleEditMovie(movieId: number) {
-    console.log(`editing movie with id: ${movieId}`);
+  async function handleSaveMovie(e: FormEvent<HTMLFormElement>, newMovieId: number) {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const data = new FormData(form);
+    const movie: Movie = {
+      title: data.get("title") as string,
+      summary: data.get("summary") as string,
+      link: data.get("link") as string,
+      rating: Number(data.get("rating") as string),
+      movieId: newMovieId,
+    };
+    if (movie.title && movie.link && movie.summary) {
+      const updatedMovie = await updateMovie(movie);
+      if (updatedMovie){
+        console.log(`edited movie with id: ${updatedMovie?.movieId}`);
+        const index = movies.findIndex((m) => m.movieId === updatedMovie.movieId);
+        const newMovies = [...movies];
+        newMovies[index] = updatedMovie;
+        setMovies(newMovies);
+      }
+      form.reset();
+    } else {
+      console.log("movie not edited");
+    }
   }
 
   async function handleDeleteMovie(movieId: number) {
@@ -61,11 +83,11 @@ function App() {
   return (
     <>
       <h1>Movies</h1>
-      <MovieForm onSaveMovie={handleSaveMovie} />
+      <MovieForm onAddMovie={handleAddMovie} />
       {movies.map((m, i) => (
         <MovieCard
           movie={m}
-          onEditMovie={handleEditMovie}
+          onSaveMovie={handleSaveMovie}
           onDeleteMovie={handleDeleteMovie}
           key={i}
         />
