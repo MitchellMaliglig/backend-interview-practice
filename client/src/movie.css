@@ -1,0 +1,28 @@
+div.movie-card {
+  background-color: rgb(0, 128, 128);
+  border-radius: 0.5rem;
+  border: solid 0.2rem rgb(0, 85, 85);
+  margin: 1rem 0;
+  padding: 1rem;
+}
+
+div.movie-buttons > button{
+    margin: .5rem 1rem;
+}
+
+div.row{
+    display: flex;
+    flex-direction: row;
+}
+
+label{
+    width: 50%;
+    margin: 1rem 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+input{
+    width: 80%;
+}
